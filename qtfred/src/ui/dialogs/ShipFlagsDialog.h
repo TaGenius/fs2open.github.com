@@ -31,8 +31,32 @@ class ShipFlagsDialog : public QDialog {
 
 	void updateUI();
 
-	void destroyBeforeMissionChanged(bool);
-};
+	void destroyBeforeMissionChanged(int);
+	void destroyBeforeMissionSecondsChanged(int);
+	void scanableChanged(int);
+	void cargoChanged(int);
+	void subsytemScanningChanged(int);
+	void reinforcementChanged(int);
+	void protectShipChanged(int);
+	void beamProtectChanged(int);
+	void flakProtectChanged(int);
+	void laserProtectChanged(int);
+	void missileProtectChanged(int);
+	void ignoreForGoalsChanged(int);
+	void escortChanged(int);
+	void escortValueChanged(int);
+	void noArrivalMusicChanged(int);
+	void invulnerableChanged(int);
+	void guardianedChanged(int);
+	void primitiveChanged(int);
+	void noSubspaceChanged(int);
+	void hiddenChanged(int);
+	void stealthChanged(int);
+	void friendlyStealthChanged(int);
+	void kamikazeChanged(int);
+	void kamikazeDamageChanged(int);
+	void immobileChanged(int);
+	};
 } // namespace dialogs
 } // namespace fred
 } // namespace fso

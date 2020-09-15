@@ -63,6 +63,7 @@ class ShipFlagsDialogModel : public AbstractDialogModel {
 
 	void set_modified();
 	int tristate_set(int val, int cur_state);
+	void update_ship(int);
 
   public:
 	ShipFlagsDialogModel(QObject* parent, EditorViewport* viewport);
@@ -70,8 +71,78 @@ class ShipFlagsDialogModel : public AbstractDialogModel {
 	bool apply() override;
 	void reject() override;
 
-	void setDestroyed(bool);
-	bool getDestroyed();
+	void setDestroyed(int);
+	int getDestroyed();
+
+	void setDestroyedSeconds(int);
+	int getDestroyedSeconds();
+
+	void setScanable(int);
+	int getScanable();
+
+	void setCargoKnown(int);
+	int getCargoKnown();
+
+	void setSubsystemScanning(int);
+	int getSubsystemScanning();
+
+	void setReinforcment(int);
+	int getReinforcment();
+
+	void setProtectShip(int);
+	int getProtectShip();
+
+	void setBeamProtect(int);
+	int getBeamProtect();
+
+	void setFlakProtect(int);
+	int getFlakProtect();
+
+	void setLaserProtect(int);
+	int getLaserProtect();
+
+	void setMissileProtect(int);
+	int getMissileProtect();
+
+	void setIgnoreForGoals(int);
+	int getIgnoreForGoals();
+
+	void setEscort(int);
+	int getEscort();
+	void setEscortValue(int);
+	int getEscortValue();
+
+	void setNoArrivalMusic(int);
+	int getNoArrivalMusic();
+
+	void setInvulnerable(int);
+	int getInvulnerable();
+
+	void setGuardianed(int);
+	int getGuardianed();
+
+	void setPrimitiveSensors(int);
+	int getPrimitiveSensors();
+
+	void setNoSubspaceDrive(int);
+	int getNoSubspaceDrive();
+
+	void setHidden(int);
+	int getHidden();
+
+	void setStealth(int);
+	int getStealth();
+
+	void setFriendlyStealth(int);
+	int getFriendlyStealth();
+
+	void setKamikaze(int);
+	int getKamikaze();
+	void setKamikazeDamage(int);
+	int getKamikazeDamage();
+
+	void setImmobile(int);
+	int getImmobile();
 
 	bool query_modified();
 };

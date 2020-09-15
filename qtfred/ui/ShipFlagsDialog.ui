@@ -111,7 +111,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="lasetProtectCheckbox">
+         <widget class="QCheckBox" name="laserProtectCheckbox">
           <property name="text">
            <string>Laser Protect Ship</string>
           </property>
@@ -148,7 +148,7 @@
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="escortLayout">
+      <layout class="QHBoxLayout" name="escortLayout" stretch="0,0,1">
        <item>
         <spacer name="escortSpacer">
          <property name="orientation">
@@ -173,7 +173,11 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="escortPriorityEdit"/>
+        <widget class="QSpinBox" name="escortPrioritySpinBox">
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::NoButtons</enum>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -268,7 +272,7 @@
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="kamikazeLayout">
+      <layout class="QHBoxLayout" name="kamikazeLayout" stretch="0,0,1">
        <item>
         <spacer name="kamikazeSpacer">
          <property name="orientation">
@@ -293,7 +297,11 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="kamikazeDamageEdit"/>
+        <widget class="QSpinBox" name="kamikazeDamageSpinBox">
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::NoButtons</enum>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -420,7 +428,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="respawnPriorityEdit"/>
+        <widget class="QSpinBox" name="respawnPrioritySpinBox"/>
        </item>
       </layout>
      </item>

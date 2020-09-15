@@ -10,6 +10,7 @@ class ShipFlagCheckbox : public QCheckBox {
 
   protected:
 	void nextCheckState() override;
+
 };
 }
 } // namespace fso
