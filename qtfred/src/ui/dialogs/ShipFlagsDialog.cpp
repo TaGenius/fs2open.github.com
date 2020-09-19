@@ -63,6 +63,33 @@ ShipFlagsDialog::ShipFlagsDialog(QWidget* parent, EditorViewport* viewport)
 		&ShipFlagsDialog::kamikazeDamageChanged);
 	connect(ui->noMoveCheckbox, &QCheckBox::stateChanged, this, &ShipFlagsDialog::immobileChanged);
 
+	// Column Two
+	connect(ui->noDynamicGoalsCheckbox, &QCheckBox::stateChanged, this, &ShipFlagsDialog::noDynamicGoalsChanged);
+	connect(ui->redAlertCheckbox, &QCheckBox::stateChanged, this, &ShipFlagsDialog::redAlertChanged);
+	connect(ui->gravityCheckbox, &QCheckBox::stateChanged, this, &ShipFlagsDialog::gravityChanged);
+	connect(ui->specialWarpinCheckbox, &QCheckBox::stateChanged, this, &ShipFlagsDialog::warpinChanged);
+	connect(ui->targetableAsBombCheckbox, &QCheckBox::stateChanged, this, &ShipFlagsDialog::targetableAsBombChanged);
+	connect(ui->disableBuiltInMessagesCheckbox,
+		&QCheckBox::stateChanged,
+		this,
+		&ShipFlagsDialog::disableBuiltInMessagesChanged);
+	connect(ui->neverScreamCheckbox, &QCheckBox::stateChanged, this, &ShipFlagsDialog::neverScreamChanged);
+	connect(ui->alwaysScreamCheckbox, &QCheckBox::stateChanged, this, &ShipFlagsDialog::alwaysScreamChanged);
+	connect(ui->vaporizeCheckbox, &QCheckBox::stateChanged, this, &ShipFlagsDialog::vaporizeChanged);
+	connect(ui->respawnPrioritySpinBox,
+		static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+		this,
+		&ShipFlagsDialog::respawnPriorityChanged);
+	connect(ui->autoCarryCheckbox, &QCheckBox::stateChanged, this, &ShipFlagsDialog::autoCarryChanged);
+	connect(ui->autoLinkCheckbox, &QCheckBox::stateChanged, this, &ShipFlagsDialog::autoLinkChanged);
+	connect(ui->hideShipNameCheckbox, &QCheckBox::stateChanged, this, &ShipFlagsDialog::hideShipNameChanged);
+	connect(ui->classDynamicCheckbox, &QCheckBox::stateChanged, this, &ShipFlagsDialog::classDynamicChanged);
+	connect(ui->disableETSCheckbox, &QCheckBox::stateChanged, this, &ShipFlagsDialog::disableETSChanged);
+	connect(ui->cloakCheckbox, &QCheckBox::stateChanged, this, &ShipFlagsDialog::cloakChanged);
+	connect(ui->scrambleMessagesCheckbox, &QCheckBox::stateChanged, this, &ShipFlagsDialog::scrambleMessagesChanged);
+	connect(ui->noCollideCheckbox, &QCheckBox::stateChanged, this, &ShipFlagsDialog::noCollideChanged);
+	connect(ui->noSelfDestructCheckbox, &QCheckBox::stateChanged, this, &ShipFlagsDialog::noSelfDestructChanged);
+
 	updateUI();
 
 	// Resize the dialog to the minimum size
@@ -163,9 +190,72 @@ void ShipFlagsDialog::updateUI()
 	ui->kamikazeCheckbox->setCheckState(Qt::CheckState(value));
 	value = _model->getKamikazeDamage();
 	ui->kamikazeDamageSpinBox->setValue(value);
-	//Does Not move
+	// Does Not move
 	value = _model->getImmobile();
 	ui->noMoveCheckbox->setCheckState(Qt::CheckState(value));
+	// Column Two
+	// No Dynamic Goals
+	value = _model->getNoDynamicGoals();
+	ui->noDynamicGoalsCheckbox->setCheckState(Qt::CheckState(value));
+	// Red Alert Carry
+	value = _model->getRedAlert();
+	ui->redAlertCheckbox->setCheckState(Qt::CheckState(value));
+	// Affected By Gravity
+	value = _model->getGravity();
+	ui->gravityCheckbox->setCheckState(Qt::CheckState(value));
+	// Special Warpin
+	value = _model->getWarpin();
+	ui->specialWarpinCheckbox->setCheckState(Qt::CheckState(value));
+	// Targetable As Bomb
+	value = _model->getTargetableAsBomb();
+	ui->targetableAsBombCheckbox->setCheckState(Qt::CheckState(value));
+	// Disable Built-in Messages
+	value = _model->getDisableBuiltInMessages();
+	ui->disableBuiltInMessagesCheckbox->setCheckState(Qt::CheckState(value));
+	// Never Scream On Death
+	value = _model->getNeverScream();
+	ui->neverScreamCheckbox->setCheckState(Qt::CheckState(value));
+	// Always Scream on Death
+	value = _model->getAlwaysScream();
+	ui->alwaysScreamCheckbox->setCheckState(Qt::CheckState(value));
+	// Vaporize on Death
+	value = _model->getVaporize();
+	ui->vaporizeCheckbox->setCheckState(Qt::CheckState(value));
+	// Respawn
+	if (The_mission.game_type & MISSION_TYPE_MULTI) {
+		ui->respawnPrioritySpinBox->setEnabled(true);
+	} else {
+		ui->respawnPrioritySpinBox->setEnabled(false);
+	}
+	value = _model->getRespawnPriority();
+	ui->respawnPrioritySpinBox->setValue(value);
+	// AutoNav Carry Status
+	value = _model->getAutoCarry();
+	ui->autoCarryCheckbox->setCheckState(Qt::CheckState(value));
+	// AutoNav Needs Link
+	value = _model->getAutoLink();
+	ui->autoLinkCheckbox->setCheckState(Qt::CheckState(value));
+	// Hide Ship Name
+	value = _model->getHideShipName();
+	ui->hideShipNameCheckbox->setCheckState(Qt::CheckState(value));
+	// Set Class Dynamically
+	value = _model->getClassDynamic();
+	ui->classDynamicCheckbox->setCheckState(Qt::CheckState(value));
+	//Disable ETS
+	value = _model->getDisableETS();
+	ui->disableETSCheckbox->setCheckState(Qt::CheckState(value));
+	//Cloaked
+	value = _model->getCloak();
+	ui->cloakCheckbox->setCheckState(Qt::CheckState(value));
+	//Scramble Messages
+	value = _model->getScrambleMessages();
+	ui->scrambleMessagesCheckbox->setCheckState(Qt::CheckState(value));
+	//No Collisions
+	value = _model->getNoCollide();
+	ui->noCollideCheckbox->setCheckState(Qt::CheckState(value));
+	//No Disabled Self-Destruct
+	value = _model->getNoSelfDestruct();
+	ui->noSelfDestructCheckbox->setCheckState(Qt::CheckState(value));
 }
 
 void ShipFlagsDialog::destroyBeforeMissionChanged(int value)
@@ -291,6 +381,101 @@ void ShipFlagsDialog::kamikazeDamageChanged(int value)
 void ShipFlagsDialog::immobileChanged(int value)
 {
 	_model->setImmobile(value);
+}
+
+void ShipFlagsDialog::noDynamicGoalsChanged(int value)
+{
+	_model->setNoDynamicGoals(value);
+}
+
+void ShipFlagsDialog::redAlertChanged(int value)
+{
+	_model->setRedAlert(value);
+}
+
+void ShipFlagsDialog::gravityChanged(int value)
+{
+	_model->setGravity(value);
+}
+
+void ShipFlagsDialog::warpinChanged(int value)
+{
+	_model->setWarpin(value);
+}
+
+void ShipFlagsDialog::targetableAsBombChanged(int value)
+{
+	_model->setTargetableAsBomb(value);
+}
+
+void ShipFlagsDialog::disableBuiltInMessagesChanged(int value)
+{
+	_model->setDisableBuiltInMessages(value);
+}
+
+void ShipFlagsDialog::neverScreamChanged(int value)
+{
+	_model->setNeverScream(value);
+}
+
+void ShipFlagsDialog::alwaysScreamChanged(int value)
+{
+	_model->setAlwaysScream(value);
+}
+
+void ShipFlagsDialog::vaporizeChanged(int value)
+{
+	_model->setVaporize(value);
+}
+
+void ShipFlagsDialog::respawnPriorityChanged(int value)
+{
+	_model->setRespawnPriority(value);
+}
+
+void ShipFlagsDialog::autoCarryChanged(int value)
+{
+	_model->setAutoCarry(value);
+}
+
+void ShipFlagsDialog::autoLinkChanged(int value)
+{
+	_model->setAutoLink(value);
+}
+
+void ShipFlagsDialog::hideShipNameChanged(int value)
+{
+	_model->setHideShipName(value);
+}
+
+void ShipFlagsDialog::classDynamicChanged(int value)
+{
+	_model->setClassDynamic(value);
+}
+
+void ShipFlagsDialog::disableETSChanged(int value)
+{
+	_model->setDisableETS(value);
+}
+
+void ShipFlagsDialog::cloakChanged(int value)
+{
+	_model->setCloak(value);
+}
+
+void ShipFlagsDialog::scrambleMessagesChanged(int value)
+{
+	_model->setScrambleMessages(value);
+}
+
+void ShipFlagsDialog::noCollideChanged(int value)
+{
+	_model->setNoCollide(value);
+}
+
+void ShipFlagsDialog::noSelfDestructChanged(int value)
+{
+	_model->setNoSelfDestruct(value);
 }
 
 } // namespace dialogs

@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Additional Ship Properties</string>
   </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <layout class="QVBoxLayout" name="ColumnOneLayout">

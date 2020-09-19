@@ -144,6 +144,63 @@ class ShipFlagsDialogModel : public AbstractDialogModel {
 	void setImmobile(int);
 	int getImmobile();
 
+	void setNoDynamicGoals(int);
+	int getNoDynamicGoals();
+
+	void setRedAlert(int);
+	int getRedAlert();
+
+	void setGravity(int);
+	int getGravity();
+
+	void setWarpin(int);
+	int getWarpin();
+
+	void setTargetableAsBomb(int);
+	int getTargetableAsBomb();
+
+	void setDisableBuiltInMessages(int);
+	int getDisableBuiltInMessages();
+
+	void setNeverScream(int);
+	int getNeverScream();
+
+	void setAlwaysScream(int);
+	int getAlwaysScream();
+
+	void setVaporize(int);
+	int getVaporize();
+
+	void setRespawnPriority(int);
+	int getRespawnPriority();
+
+	void setAutoCarry(int);
+	int getAutoCarry();
+
+	void setAutoLink(int);
+	int getAutoLink();
+
+	void setHideShipName(int);
+	int getHideShipName();
+
+	void setClassDynamic(int);
+	int getClassDynamic();
+
+	void setDisableETS(int);
+	int getDisableETS();
+
+	void setCloak(int);
+	int getCloak();
+
+	void setScrambleMessages(int);
+	int getScrambleMessages();
+
+	void setNoCollide(int);
+	int getNoCollide();
+
+	void setNoSelfDestruct(int);
+	int getNoSelfDestruct();
+
 	bool query_modified();
 };
 

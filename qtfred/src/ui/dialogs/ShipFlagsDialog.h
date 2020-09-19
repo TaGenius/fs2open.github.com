@@ -56,6 +56,25 @@ class ShipFlagsDialog : public QDialog {
 	void kamikazeChanged(int);
 	void kamikazeDamageChanged(int);
 	void immobileChanged(int);
+	void noDynamicGoalsChanged(int);
+	void redAlertChanged(int);
+	void gravityChanged(int);
+	void warpinChanged(int);
+	void targetableAsBombChanged(int);
+	void disableBuiltInMessagesChanged(int);
+	void neverScreamChanged(int);
+	void alwaysScreamChanged(int);
+	void vaporizeChanged(int);
+	void respawnPriorityChanged(int);
+	void autoCarryChanged(int);
+	void autoLinkChanged(int);
+	void hideShipNameChanged(int);
+	void classDynamicChanged(int);
+	void disableETSChanged(int);
+	void cloakChanged(int);
+	void scrambleMessagesChanged(int);
+	void noCollideChanged(int);
+	void noSelfDestructChanged(int);
 	};
 } // namespace dialogs
 } // namespace fred

@@ -912,6 +912,195 @@ int ShipFlagsDialogModel::getImmobile()
 	return m_immobile;
 }
 
+void ShipFlagsDialogModel::setNoDynamicGoals(int state)
+{
+	modify(m_no_dynamic, state);
+}
+
+int ShipFlagsDialogModel::getNoDynamicGoals()
+{
+	return m_no_dynamic;
+}
+
+void ShipFlagsDialogModel::setRedAlert(int state)
+{
+	modify(m_red_alert_carry, state);
+}
+
+int ShipFlagsDialogModel::getRedAlert()
+{
+	return m_red_alert_carry;
+}
+
+void ShipFlagsDialogModel::setGravity(int state)
+{
+	modify(m_affected_by_gravity, state);
+}
+
+int ShipFlagsDialogModel::getGravity()
+{
+	return m_affected_by_gravity;
+}
+
+void ShipFlagsDialogModel::setWarpin(int state)
+{
+	modify(m_special_warpin, state);
+}
+
+int ShipFlagsDialogModel::getWarpin()
+{
+	return m_special_warpin;
+}
+
+void ShipFlagsDialogModel::setTargetableAsBomb(int state)
+{
+	modify(m_targetable_as_bomb, state);
+}
+
+int ShipFlagsDialogModel::getTargetableAsBomb()
+{
+	return m_targetable_as_bomb;
+}
+
+void ShipFlagsDialogModel::setDisableBuiltInMessages(int state)
+{
+	modify(m_disable_messages, state);
+}
+
+int ShipFlagsDialogModel::getDisableBuiltInMessages()
+{
+	return m_disable_messages;
+}
+
+void ShipFlagsDialogModel::setNeverScream(int state)
+{
+	modify(m_no_death_scream, state);
+}
+
+int ShipFlagsDialogModel::getNeverScream()
+{
+	return m_no_death_scream;
+}
+
+void ShipFlagsDialogModel::setAlwaysScream(int state) {
+	modify(m_always_death_scream, state);
+}
+
+int ShipFlagsDialogModel::getAlwaysScream()
+{
+	return m_always_death_scream;
+}
+
+void ShipFlagsDialogModel::setVaporize(int state)
+{
+	modify(m_vaporize, state);
+}
+
+int ShipFlagsDialogModel::getVaporize()
+{
+	return m_vaporize;
+}
+
+void ShipFlagsDialogModel::setRespawnPriority(int value)
+{
+	modify(m_respawn_priority, value);
+}
+
+int ShipFlagsDialogModel::getRespawnPriority()
+{
+	return m_respawn_priority;
+}
+
+void ShipFlagsDialogModel::setAutoCarry(int state)
+{
+	modify(m_nav_carry, state);
+}
+
+int ShipFlagsDialogModel::getAutoCarry()
+{
+	return m_nav_carry;
+}
+
+void ShipFlagsDialogModel::setAutoLink(int state)
+{
+	modify(m_nav_needslink, state);
+}
+
+int ShipFlagsDialogModel::getAutoLink()
+{
+	return m_nav_needslink;
+}
+
+void ShipFlagsDialogModel::setHideShipName(int state)
+{
+	modify(m_hide_ship_name, state);
+}
+
+int ShipFlagsDialogModel::getHideShipName()
+{
+	return m_hide_ship_name;
+}
+
+void ShipFlagsDialogModel::setClassDynamic(int state)
+{
+	modify(m_set_class_dynamically, state);
+}
+
+int ShipFlagsDialogModel::getClassDynamic()
+{
+	return m_set_class_dynamically;
+}
+
+void ShipFlagsDialogModel::setDisableETS(int state)
+{
+	modify(m_disable_ets, state);
+}
+
+int ShipFlagsDialogModel::getDisableETS()
+{
+	return m_disable_ets;
+}
+
+void ShipFlagsDialogModel::setCloak(int state)
+{
+	modify(m_cloaked, state);
+}
+
+int ShipFlagsDialogModel::getCloak()
+{
+	return m_cloaked;
+}
+
+void ShipFlagsDialogModel::setScrambleMessages(int state)
+{
+	modify(m_scramble_messages, state);
+}
+
+int ShipFlagsDialogModel::getScrambleMessages()
+{
+	return m_scramble_messages;
+}
+
+void ShipFlagsDialogModel::setNoCollide(int state)
+{
+	modify(m_no_collide, state);
+}
+
+int ShipFlagsDialogModel::getNoCollide()
+{
+	return m_no_collide;
+}
+
+void ShipFlagsDialogModel::setNoSelfDestruct(int state)
+{
+	modify(m_no_disabled_self_destruct, state);
+}
+
+int ShipFlagsDialogModel::getNoSelfDestruct()
+{
+	return m_no_disabled_self_destruct;
+}
+
 bool ShipFlagsDialogModel::query_modified()
 {
 	return _modified;
