@@ -118,7 +118,7 @@ void ShipInitialStatusDialog::updateUI()
 	}
 	value = _model->getHasShield();
 	ui->hasShieldCheckBox->setCheckState(Qt::CheckState(value));
-	if (!_model->getHasShield()) {
+	if (_model->getHasShield()) {
 		ui->shieldHullSpinBox->setEnabled(true);
 	} else {
 		ui->shieldHullSpinBox->setEnabled(false);
