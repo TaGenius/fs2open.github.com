@@ -153,6 +153,7 @@ add_file_folder("UI"
 	ui/ShipEditorDialog.ui
 	ui/ShipFlagsDialog.ui
 	ui/ShipInitialStatus.ui
+	ui/ShipGoalsDialog.ui
 )
 
 add_file_folder("Resources"
