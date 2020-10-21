@@ -19,7 +19,7 @@ class ShipInitialStatusDialog : public QDialog {
 	Q_OBJECT
 
   public:
-	explicit ShipInitialStatusDialog(ShipEditorDialog* parent, EditorViewport* viewport, bool multi);
+	explicit ShipInitialStatusDialog(QWidget* parent, EditorViewport* viewport, bool multi);
 	~ShipInitialStatusDialog() override;
 
   protected:
@@ -36,6 +36,7 @@ class ShipInitialStatusDialog : public QDialog {
 	void updateDockee();
 	void list_dockees(int);
 	void list_dockee_points(int);
+	void updateSubsystems();
 
 	int cur_docker_point = -1;
 	int cur_dockee;
@@ -58,6 +59,10 @@ class ShipInitialStatusDialog : public QDialog {
 	void dockeeComboChanged(int);
 	void dockeePointChanged(int);
 	// Subsystems
+	void subsystemChanged(int);
+	void subIntegrityChanged(int);
+	void cargoChanged();
+	void colourChanged(int);
 };
 } // namespace dialogs
 } // namespace fred

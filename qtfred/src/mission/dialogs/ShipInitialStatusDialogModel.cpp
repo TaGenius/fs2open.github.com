@@ -6,11 +6,12 @@
 #include <globalincs/linklist.h>
 
 #include <QtWidgets>
+#include <object/objectdock.cpp>
 
 namespace fso {
 namespace fred {
 namespace dialogs {
-void reset_arrival_to_false(int shipnum, bool reset_wing)
+void reset_arrival_to_false(int shipnum, bool reset_wing, EditorViewport* _viewport)
 {
 	char buf[256];
 	ship* shipp = &Ships[shipnum];
@@ -18,8 +19,8 @@ void reset_arrival_to_false(int shipnum, bool reset_wing)
 	// falsify the ship cue
 	if (set_cue_to_false(&shipp->arrival_cue)) {
 		sprintf(buf, "Setting arrival cue of ship %s\nto false for initial docking purposes.", shipp->ship_name);
-		MessageBox(NULL, buf, "", MB_OK | MB_ICONEXCLAMATION);
-		//_viewport->dialogProvider->showButtonDialog(DialogType::Information, "Notice", buf, {DialogButton::Ok});
+		// MessageBox(NULL, buf, "", MB_OK | MB_ICONEXCLAMATION);
+		_viewport->dialogProvider->showButtonDialog(DialogType::Information, "Notice", buf, {DialogButton::Ok});
 	}
 
 	// falsify the wing cue and all ships in that wing
@@ -30,12 +31,12 @@ void reset_arrival_to_false(int shipnum, bool reset_wing)
 		if (set_cue_to_false(&wingp->arrival_cue)) {
 
 			sprintf(buf, "Setting arrival cue of wing %s\nto false for initial docking purposes.", wingp->name);
-			MessageBox(NULL, buf, "", MB_OK | MB_ICONEXCLAMATION);
-			//_viewport->dialogProvider->showButtonDialog(DialogType::Information, "Notice", buf, {DialogButton::Ok});
+			// MessageBox(NULL, buf, "", MB_OK | MB_ICONEXCLAMATION);
+			_viewport->dialogProvider->showButtonDialog(DialogType::Information, "Notice", buf, {DialogButton::Ok});
 		}
 
 		for (i = 0; i < wingp->wave_count; i++)
-			reset_arrival_to_false(wingp->ship_index[i], false);
+			reset_arrival_to_false(wingp->ship_index[i], false, _viewport);
 	}
 }
 bool set_cue_to_false(int* cue)
@@ -54,11 +55,11 @@ bool set_cue_to_false(int* cue)
 }
 
 // self-explanatory, really
-void initial_status_unmark_dock_handled_flag(object* objp, dock_function_info* infop)
+void initial_status_unmark_dock_handled_flag(object* objp, dock_function_info* infop, EditorViewport* viewport)
 {
 	objp->flags.remove(Object::Object_Flags::Docked_already_handled);
 }
-void initial_status_mark_dock_leader_helper(object* objp, dock_function_info* infop)
+void initial_status_mark_dock_leader_helper(object* objp, dock_function_info* infop, EditorViewport* viewport)
 {
 	ship* shipp = &Ships[objp->instance];
 	int cue_to_check;
@@ -87,13 +88,13 @@ void initial_status_mark_dock_leader_helper(object* objp, dock_function_info* in
 			// keep existing leader if he has a higher priority than us
 			if (ship_class_compare(shipp->ship_info_index, leader_shipp->ship_info_index) >= 0) {
 				// set my arrival cue to false
-				reset_arrival_to_false(SHIP_INDEX(shipp), true);
+				reset_arrival_to_false(SHIP_INDEX(shipp), true, viewport);
 				return;
 			}
 
 			// otherwise, unmark the existing leader and set his arrival cue to false
 			leader_shipp->flags.remove(Ship::Ship_Flags::Dock_leader);
-			reset_arrival_to_false(SHIP_INDEX(leader_shipp), true);
+			reset_arrival_to_false(SHIP_INDEX(leader_shipp), true, viewport);
 		}
 
 		// mark and save me as the leader
@@ -271,6 +272,16 @@ void ShipInitialStatusDialogModel::initializeData()
 			objp = GET_NEXT(objp);
 		}
 	}
+
+	if (objp != NULL) {
+		if (objp->type == OBJ_SHIP || objp->type == OBJ_START) {
+			ship* shipp = &Ships[objp->instance];
+
+			if (Ship_info[shipp->ship_info_index].uses_team_colors) {
+				m_use_teams = true;
+			}
+		}
+	}
 	change_subsys(0);
 
 	if (vflag) {
@@ -385,6 +396,95 @@ void ShipInitialStatusDialogModel::dock(object* objp, int dockpoint, object* oth
 	if (dfi.maintained_variables.int_value == 0)
 		Ships[objp->instance].flags.set(Ship::Ship_Flags::Dock_leader);
 }
+// Duplicated from objectdock to handle scope errors
+void ShipInitialStatusDialogModel::dock_evaluate_all_docked_objects(object* objp,
+	dock_function_info* infop,
+	void (*function)(object*, dock_function_info*, EditorViewport*))
+{
+	Assertion((objp != nullptr) && (infop != nullptr) && (function != nullptr),
+		"dock_evaluate_all_docked_objects, invalid argument(s)");
+
+	// not docked?
+	if (!object_is_docked(objp)) {
+		// call the function for just the one object
+		function(objp, infop, _viewport);
+		return;
+	}
+
+	// we only have two objects docked
+	if (dock_check_docked_one_on_one(objp)) {
+		// call the function for the first object, and return if instructed
+		function(objp, infop, _viewport);
+		if (infop->early_return_condition)
+			return;
+
+		// call the function for the second object, and return if instructed
+		function(objp->dock_list->docked_objp, infop, _viewport);
+		if (infop->early_return_condition)
+			return;
+	}
+
+	// we have multiple objects docked and we're treating them as a hub
+	else if (dock_check_assume_hub()) {
+		// get the hub
+		object* hub_objp = dock_get_hub(objp);
+
+		// call the function for the hub, and return if instructed
+		function(hub_objp, infop, _viewport);
+		if (infop->early_return_condition)
+			return;
+
+		// iterate through all docked objects
+		for (dock_instance* ptr = hub_objp->dock_list; ptr != NULL; ptr = ptr->next) {
+			// call the function for this object, and return if instructed
+			function(ptr->docked_objp, infop, _viewport);
+			if (infop->early_return_condition)
+				return;
+		}
+	}
+
+	// we have multiple objects docked and we must treat them as a tree
+	else {
+		// create a bit array to mark the objects we check
+		ubyte* visited_bitstring = (ubyte*)vm_malloc(calculate_num_bytes(MAX_OBJECTS));
+
+		// clear it
+		memset(visited_bitstring, 0, calculate_num_bytes(MAX_OBJECTS));
+
+		// start evaluating the tree
+		dock_evaluate_tree(objp, infop, function, visited_bitstring);
+
+		// destroy the bit array
+		vm_free(visited_bitstring);
+		visited_bitstring = NULL;
+	}
+}
+
+void ShipInitialStatusDialogModel::dock_evaluate_tree(object* objp,
+	dock_function_info* infop,
+	void (*function)(object*, dock_function_info*, EditorViewport*),
+	ubyte* visited_bitstring)
+{
+	// make sure we haven't visited this object already
+	if (get_bit(visited_bitstring, OBJ_INDEX(objp)))
+		return;
+
+	// mark as visited
+	set_bit(visited_bitstring, OBJ_INDEX(objp));
+
+	// call the function for this object, and return if instructed
+	function(objp, infop, _viewport);
+	if (infop->early_return_condition)
+		return;
+
+	// iterate through all docked objects
+	for (dock_instance* ptr = objp->dock_list; ptr != NULL; ptr = ptr->next) {
+		// start another tree with the docked object as the root, and return if instructed
+		dock_evaluate_tree(ptr->docked_objp, infop, function, visited_bitstring);
+		if (infop->early_return_condition)
+			return;
+	}
+}
 
 bool ShipInitialStatusDialogModel::apply()
 {
@@ -441,6 +541,7 @@ bool ShipInitialStatusDialogModel::apply()
 	}
 	Ships[m_ship].team_name = m_team_color_setting;
 	update_docking_info();
+	_editor->missionChanged();
 	return true;
 }
 
@@ -568,11 +669,39 @@ const int ShipInitialStatusDialogModel::getAfterburnerDisabled()
 	return m_afterburner_locked;
 }
 
-void ShipInitialStatusDialogModel::change_subsys(int new_subsys)
+void ShipInitialStatusDialogModel::setDamage(int value)
+{
+	modify(m_damage, value);
+}
+
+const int ShipInitialStatusDialogModel::getDamage()
+{
+	return m_damage;
+}
+
+SCP_string ShipInitialStatusDialogModel::getCargo()
+{
+	return m_cargo_name;
+}
+
+void ShipInitialStatusDialogModel::setCargo(const SCP_string& text)
+{
+	modify(m_cargo_name, text);
+}
+
+SCP_string ShipInitialStatusDialogModel::getColour()
+{
+	return m_team_color_setting;
+}
+
+void ShipInitialStatusDialogModel::setColour(const SCP_string& text)
+{
+	modify(m_team_color_setting, text);
+}
+
+void ShipInitialStatusDialogModel::change_subsys(int new_subsys = 0)
 {
 	int z, cargo_index;
-	bool enable = false, enable_cargo_name = false;
-	int ship_has_scannable_subsystems;
 	ship_subsys* ptr;
 	// Goober5000
 	ship_has_scannable_subsystems = Ship_info[Ships[m_ship].ship_info_index].is_huge_ship();
@@ -580,7 +709,7 @@ void ShipInitialStatusDialogModel::change_subsys(int new_subsys)
 		ship_has_scannable_subsystems = !ship_has_scannable_subsystems;
 	}
 
-	if (cur_subsys != LB_ERR) {
+	if (cur_subsys != -1) {
 		ptr = GET_FIRST(&Ships[m_ship].subsys_list);
 		while (cur_subsys--) {
 			Assert(ptr != END_OF_LIST(&Ships[m_ship].subsys_list));
@@ -626,7 +755,6 @@ void ShipInitialStatusDialogModel::change_subsys(int new_subsys)
 
 		m_damage = 100 - (int)ptr->current_hits;
 		if (ship_has_scannable_subsystems) {
-			enable_cargo_name = true;
 			if (ptr->subsys_cargo_name > 0) {
 				m_cargo_name = Cargo_names[ptr->subsys_cargo_name];
 			} else {
@@ -635,7 +763,6 @@ void ShipInitialStatusDialogModel::change_subsys(int new_subsys)
 		} else {
 			m_cargo_name = "";
 		}
-		enable = true;
 	}
 }
 
@@ -647,6 +774,11 @@ const int ShipInitialStatusDialogModel::getShip()
 const int ShipInitialStatusDialogModel::getnum_dock_points()
 {
 	return num_dock_points;
+}
+
+const int ShipInitialStatusDialogModel::getShip_has_scannable_subsystems()
+{
+	return ship_has_scannable_subsystems;
 }
 
 const dockpoint_information* ShipInitialStatusDialogModel::getdockpoint_array()

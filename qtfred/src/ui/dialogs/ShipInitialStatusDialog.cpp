@@ -7,6 +7,7 @@
 #include <globalincs/linklist.h>
 #include <mission/object.h>
 #include <ui/util/SignalBlockers.h>
+#include "globalincs/alphacolors.h"
 
 #include <QCloseEvent>
 
@@ -14,7 +15,7 @@ namespace fso {
 namespace fred {
 namespace dialogs {
 
-ShipInitialStatusDialog::ShipInitialStatusDialog(ShipEditorDialog* parent, EditorViewport* viewport, bool multi)
+ShipInitialStatusDialog::ShipInitialStatusDialog(QWidget* parent, EditorViewport* viewport, bool multi)
 	: QDialog(parent), ui(new Ui::ShipInitialStatusDialog()),
 	  _model(new ShipInitialStatusDialogModel(this, viewport, multi)), _viewport(viewport)
 {
@@ -58,6 +59,18 @@ ShipInitialStatusDialog::ShipInitialStatusDialog(ShipEditorDialog* parent, Edito
 		&QCheckBox::stateChanged,
 		this,
 		&ShipInitialStatusDialog::afterburnerLockChanged);
+
+	connect(ui->subsystemList, &QListWidget::currentRowChanged, this, &ShipInitialStatusDialog::subsystemChanged);
+
+	connect(ui->subIntegritySpinBox,
+		static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+		this,
+		&ShipInitialStatusDialog::subIntegrityChanged);
+	connect(ui->cargoEdit, &QLineEdit::editingFinished, this, &ShipInitialStatusDialog::cargoChanged);
+	connect(ui->colourComboBox,
+		static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+		this,
+		&ShipInitialStatusDialog::colourChanged);
 
 	updateUI();
 
@@ -119,6 +132,20 @@ void ShipInitialStatusDialog::updateUI()
 	updateFlags();
 	updateDocks();
 	updateDockee();
+	updateSubsystems();
+	ui->colourComboBox->clear();
+	if (_model->m_use_teams) {
+		int i = 0;
+		ui->colourComboBox->setEnabled(true);
+		ui->colourComboBox->addItem("none", i);
+		++i;
+		for (SCP_vector<SCP_string>::iterator tni = Team_Names.begin(); tni != Team_Names.end(); ++tni) {
+			ui->colourComboBox->addItem(tni->c_str(), i);
+			i++;
+		}
+		auto currentText = _model->getColour();
+		ui->colourComboBox->setCurrentIndex(ui->colourComboBox->findText(currentText.c_str()));
+	}
 }
 void ShipInitialStatusDialog::updateFlags()
 {
@@ -281,6 +308,35 @@ void ShipInitialStatusDialog::list_dockee_points(int shipnum)
 			QVariant(int(i)));
 	}
 }
+void ShipInitialStatusDialog::updateSubsystems()
+{
+	ship_subsys* ptr;
+	auto index = ui->subsystemList->currentIndex();
+	ui->subsystemList->clear();
+	if (!_model->m_multi_edit) {
+		ui->subsystemList->setEnabled(true);
+		ui->subIntegritySpinBox->setEnabled(true);
+		if (_model->getShip_has_scannable_subsystems()) {
+			ui->cargoEdit->setEnabled(true);
+		}
+		for (ptr = GET_FIRST(&Ships[_model->getShip()].subsys_list);
+			 ptr != END_OF_LIST(&Ships[_model->getShip()].subsys_list);
+			 ptr = GET_NEXT(ptr)) {
+			QListWidgetItem* newItem = new QListWidgetItem;
+			newItem->setText(ptr->system_info->subobj_name);
+			ui->subsystemList->addItem(newItem);
+		}
+		ui->subsystemList->setCurrentIndex(index);
+	} else {
+		ui->subsystemList->setEnabled(false);
+		ui->subIntegritySpinBox->setEnabled(false);
+		ui->cargoEdit->setEnabled(false);
+	}
+	auto value = _model->getDamage();
+	ui->subIntegritySpinBox->setValue(value);
+	auto cargovalue = _model->getCargo();
+	ui->cargoEdit->setText(cargovalue.c_str());
+}
 void ShipInitialStatusDialog::velocityChanged(int value)
 {
 	_model->setVelocity(value);
@@ -349,6 +405,21 @@ void ShipInitialStatusDialog::dockeePointChanged(int index)
 {
 	auto dockeeData = ui->dockeePointComboBox->itemData(index).value<int>();
 	_model->setDockeePoint(cur_docker_point, dockeeData);
+}
+void ShipInitialStatusDialog::subsystemChanged(int index)
+{
+	_model->change_subsys(index);
+}
+void ShipInitialStatusDialog::subIntegrityChanged(int value)
+{
+	_model->setDamage(value);
+}
+void ShipInitialStatusDialog::cargoChanged()
+{
+	_model->setCargo(ui->cargoEdit->text().toStdString());
+}
+void ShipInitialStatusDialog::colourChanged(int index) {
+	_model->setColour(ui->colourComboBox->itemText(index).toStdString());
 }
 } // namespace dialogs
 } // namespace fred
