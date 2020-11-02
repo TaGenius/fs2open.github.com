@@ -1,7 +1,6 @@
 #include "ShipInitialStatusDialogModel.h"
 
 #include "mission/object.h"
-#include "ui/dialogs/ShipInitialStatusDialog.h"
 
 #include <globalincs/linklist.h>
 
