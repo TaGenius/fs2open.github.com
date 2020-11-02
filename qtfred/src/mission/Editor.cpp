@@ -17,7 +17,6 @@
 #include <gamesnd/eventmusic.h>
 #include <starfield/nebula.h>
 #include <object/objectdock.h>
-#include <ai/aigoals.h>
 #include <localization/fhash.h>
 
 #include "iff_defs/iff_defs.h" // iff_init
@@ -2848,6 +2847,10 @@ const char* Editor::get_order_name(int order) {
 			return entry.name;
 
 	return "???";
+}
+const ai_goal_list* Editor::getAi_goal_list()
+{
+	return Ai_goal_list;
 }
 SCP_vector<SCP_string> Editor::get_docking_list(int model_index) {
 	int i;

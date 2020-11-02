@@ -3,7 +3,9 @@
 #include "EditorViewport.h"
 #include "FredRenderer.h"
 
+#include <ai/aigoals.h>
 #include <globalincs/globals.h>
+#include <jumpnode/jumpnode.h>
 #include <object/waypoint.h>
 #include <osapi/osapi.h>
 #include <ship/ship.h>
@@ -12,7 +14,6 @@
 #include <functional>
 #include <memory>
 #include <stdexcept>
-#include <jumpnode/jumpnode.h>
 
 namespace fso {
 namespace fred {
@@ -178,6 +179,8 @@ class Editor : public QObject {
 
 	static void strip_quotation_marks(SCP_string& str);
 	static void pad_with_newline(SCP_string& str, size_t max_size);
+
+	const ai_goal_list* getAi_goal_list();
 
   private:
 	void clearMission();
